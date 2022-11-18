@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,10 +11,9 @@ model Users {
   id String @id @default(uuid())
   username String @unique
   password String
- 
 
+  accountId String @unique
   idAccount Accounts @relation(fields: [accountId], references: [id])
-  accountId String 
 }
 
 model Accounts {
@@ -25,18 +21,20 @@ model Accounts {
   balance Decimal
   credited String
   debited String
-  transaction Transaction[]
-  user Users
+  creditedTransaction Transaction[] @relation("creditedTransaction")
+  debitedTransaction Transaction[] @relation("debitedTransaction")
+
+  user Users?
 }
 
 model Transaction {
   id String @id @default(uuid())
-  
   value Decimal
   createdAd DateTime @default(now())
 
-  credited Accounts @relation(fields: [creditedAccount], references: [id])
-  debited Accounts @relation(fields: [debitedAccount], references: [id])
-  debitedAccount String
-  creditedAccount String
+  creditedAccountId String
+  credited Accounts @relation("creditedTransaction", fields: [creditedAccountId], references: [id])
+
+  debitedAccountId String
+  debited Accounts @relation("debitedTransaction", fields: [debitedAccountId], references: [id])
 }
